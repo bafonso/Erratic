@@ -309,14 +309,11 @@ void MPEToCVInterface::processMidi(std::vector<unsigned char> msg) {
 				// we don't need to shift the first byte because it's 7 bit (always starts with 0)
 				twoBytes = ( (uint16_t)msg[2] << 7) | ( (uint16_t)msg[1] ) ;
 				// std::cout << sizeof(int) << std::endl;
-				std::bitset<8> msgOne(msg[1]);
-				std::bitset<8> msgTwo(msg[2]);
-				
-				std::bitset<16> x(twoBytes);
+				// std::bitset<8> msgOne(msg[1]);
+				// std::bitset<8> msgTwo(msg[2]);
+				// std::bitset<16> x(twoBytes);
 				//std::cout << "msg[1] and 2 are " << msgOne << " " << msgTwo << " and shifted is " << x << std::endl;
-				
 				//std::cout << "twoBytes is " << (int)twoBytes << std::endl;
-
 				pitchWheel.val = twoBytes;
 				pitchWheel.changed = true;
 				}
