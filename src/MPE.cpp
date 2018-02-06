@@ -12,8 +12,8 @@ void init(rack::Plugin *p) {
 	// The ZIP package must only contain one folder, with the name equal to the plugin's slug.
 	p->slug = TOSTRING(SLUG);
 	p->version = TOSTRING(VERSION);
-	p->website = "https://github.com/VCVRack/Template";
-	p->manual = "https://github.com/VCVRack/Template/blob/master/README.md";
+	p->website = "https://github.com/bafonso/MPE";
+	p->manual = "https://github.com/bafonso/MPE/blob/master/README.md";
 
 	// For each module, specify the ModuleWidget subclass, manufacturer slug (for saving in patches), manufacturer human-readable name, module slug, and module name
 	p->addModel(createModel<MPEToCVWidget>("MPE", "MPEToCV", "MPE To CV", OSCILLATOR_TAG));

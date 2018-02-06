@@ -259,26 +259,3 @@ void ChannelChoice::onAction(EventAction &e) {
 void ChannelChoice::step() {
 	text = (midiModule->channel >= 0) ? stringf("%d", midiModule->channel + 1) : "All";
 }
-
-// void SemitoneItem::onAction(EventAction &e) {
-
-// }
-// void SemitoneChoice::onAction(EventAction &e) {
-// 	Menu *menu = gScene->createMenu();
-// 	menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
-// 	menu->box.size.x = box.size.x;
-
-// 	// {
-// 	// 	ChannelItem *bendRangeItem = new SemitoneItem();
-// 	// 	channelItem->text = "All";
-// 	// 	menu->pushChild(channelItem);
-// 	// }
-// 	int semiToneChoices[9] = {1,2,3,4,8,12,24,48,96};
-// 	for (int i = 0; i < 9; i++) {
-// 		SemitoneItem *bendRangeItem = new SemitoneItem();
-// 		bendRangeItem->bendRange	 = semiToneChoices[i];
-// 		//channelItem-> = channel;
-// 		bendRangeItem->text = stringf("%d", bendRangeItem->bendRange + 1);
-// 		menu->pushChild(bendRangeItem);
-// 	}
-// }

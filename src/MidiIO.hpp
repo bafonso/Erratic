@@ -198,17 +198,4 @@ struct ChannelChoice : ChoiceButton {
 	void onAction(EventAction &e) override;
 };
 
-// struct SemitoneItem : MenuItem {
-// 	//MidiIO *midiModule;
-// 	int bendRange;
-// 	void onAction(EventAction &e) override;
-// };
-
-// struct SemitoneChoice : ChoiceButton {
-// 	//MidiIO *midiModule;
-
-// 	void step() override;
-// 	void onAction(EventAction &e) override;
-// };
-
 

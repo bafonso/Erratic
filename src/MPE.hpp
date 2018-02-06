@@ -12,5 +12,6 @@ extern Plugin *plugin;
 
 struct MPEToCVWidget : ModuleWidget {
 	MPEToCVWidget();
+	Menu *createContextMenu() override;
 	void step() override;
 };
