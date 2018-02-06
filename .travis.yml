@@ -28,3 +28,10 @@ before_script:
   - cp -r $TRAVIS_BUILD_DIR /tmp/Rack/plugins/sdr
 script:
   - cd /tmp/Rack/plugins/sdr && VERSION=0.0.0 make dist
+deploy:
+  provider: releases
+  api_key: "GITHUB OAUTH TOKEN"
+  file: "FILE TO UPLOAD"
+  skip_cleanup: true
+  on:
+    tags: true
