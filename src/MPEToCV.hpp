@@ -5,7 +5,7 @@
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
 
-using namespace rack;
+//using namespace rack;
 /*
  * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
  * CV
@@ -100,6 +100,7 @@ struct MPEToCVInterface : MidiIO, Module {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		return rootJ;
+		
 	}
 
 	void fromJson(json_t *rootJ) override {
@@ -296,8 +297,7 @@ void MPEToCVInterface::processMidi(std::vector<unsigned char> msg) {
 				break;
 			case 0xe: // pitch wheel, we combine two 7 bit in two bytes into a 14bit msg
 				{
-				int nBytes, i;
-				double stamp;
+				int nBytes;
 				nBytes = msg.size();
 				// for ( i=0; i<nBytes; i++ )
 				//     std::cout << "Byte " << i << " = " << (int)msg[i] << ", ";
