@@ -1,11 +1,25 @@
 
-# MPE to CV plugin
+# MPE to CV modules
 
-This plugin was designed for using "Multidimensional Polyphonic Expression" (MPE) controllers such as the Haken Continuum, Linnstrument, Madrona Labs Soundplane and Roli devices with VCV Rack.
+These are VCVRack modules designed for using "Multidimensional Polyphonic Expression" (MPE) controllers such as the Haken Continuum, Linnstrument, Madrona Labs Soundplane and Roli devices with VCV Rack.
 
-The current version features a monophonic MPE module (poly to come soon) with several outputs and configuration options designed to adapt to different MPE controllers (the standard is not yet set in stone).
+We currently have a monophonic and Quad MPE to CV modules with several outputs and configuration options designed to adapt to different MPE controllers
 
-# Outputs and details
+## New Quad module
+
+I have just added a new Quad module. It is a bit more robust than the previous monophonic and now retains the settings between sessions (will fix that on the mono).
+
+![SCREENSHOT](doc/Quad_faceplate.png)
+![SCREENSHOT](doc/Quad_menu.png)
+
+
+## 1. Installation 
+
+You can find the latest release here: https://github.com/bafonso/MPE/releases
+Just download fpr you architecture and unzip in your _**Rack**_ folder located in your documents.
+
+
+## 2. Outputs and details
 1V/oct : Note you play combined with 14bit pitchwheel information. Adjust the pitch bend range (in semitones) to match your controller. Note that you can "slide" over 96 semitones using the current standard!
 
 Gate: Note On/Off 
