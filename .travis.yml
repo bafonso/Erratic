@@ -38,8 +38,10 @@ deploy:
   file: artifacts/*.zip
   name: Draft #{TRAVIS_REPO_SLUG} ${TRAVIS_TAG}
   on:
+    tags: true
+    all_branches: true
     #repo: bafonso/MPE
-    branch: v0.5
+    #branch: v0.5
   overwrite: true
   provider: releases
   skip_cleanup: true
