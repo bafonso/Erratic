@@ -2,8 +2,8 @@ language: cpp
 cache:
   directories:
   - /tmp/Rack
-before_cache:
-- rm -fr /tmp/Rack/plugins/sdr
+#before_cache:
+#- rm -fr /tmp/Rack/plugins/sdr
 osx_image: xcode9.2
 os:
 - linux
