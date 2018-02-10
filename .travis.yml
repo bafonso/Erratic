@@ -20,9 +20,6 @@ install:
   libasound2-dev libgtk2.0-dev unzip cmake3 libudev-dev libusb-dev libusb-1.0-0-dev;
   fi
 - if [ $TRAVIS_OS_NAME == osx ]; then brew install librtlsdr libusb; fi
-before_deploy:
-  - export RELEASE_PKG_FILE=$(ls *.zip)
-  - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
 before_script:
 - git clone https://github.com/VCVRack/Rack.git /tmp/Rack || cd /tmp/Rack && git pull
 - cd /tmp/Rack
@@ -35,7 +32,7 @@ before_script:
 script:
 - cd /tmp/Rack/plugins/sdr && VERSION=0.0.0 make dist
 before_deploy:
-  - export RELEASE_PKG_FILE=$(ls *.zip)
+  - export RELEASE_PKG_FILE=$(ls dist/*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
 deploy:
   provider: releases
