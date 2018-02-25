@@ -5,7 +5,7 @@
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
 
-using namespace rack;
+//using namespace rack;
 /*
  * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
  * CV
@@ -100,6 +100,7 @@ struct MPEToCVInterface : MidiIO, Module {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		return rootJ;
+		
 	}
 
 	void fromJson(json_t *rootJ) override {
@@ -296,8 +297,7 @@ void MPEToCVInterface::processMidi(std::vector<unsigned char> msg) {
 				break;
 			case 0xe: // pitch wheel, we combine two 7 bit in two bytes into a 14bit msg
 				{
-				int nBytes, i;
-				double stamp;
+				int nBytes;
 				nBytes = msg.size();
 				// for ( i=0; i<nBytes; i++ )
 				//     std::cout << "Byte " << i << " = " << (int)msg[i] << ", ";
@@ -309,14 +309,11 @@ void MPEToCVInterface::processMidi(std::vector<unsigned char> msg) {
 				// we don't need to shift the first byte because it's 7 bit (always starts with 0)
 				twoBytes = ( (uint16_t)msg[2] << 7) | ( (uint16_t)msg[1] ) ;
 				// std::cout << sizeof(int) << std::endl;
-				std::bitset<8> msgOne(msg[1]);
-				std::bitset<8> msgTwo(msg[2]);
-				
-				std::bitset<16> x(twoBytes);
+				// std::bitset<8> msgOne(msg[1]);
+				// std::bitset<8> msgTwo(msg[2]);
+				// std::bitset<16> x(twoBytes);
 				//std::cout << "msg[1] and 2 are " << msgOne << " " << msgTwo << " and shifted is " << x << std::endl;
-				
 				//std::cout << "twoBytes is " << (int)twoBytes << std::endl;
-
 				pitchWheel.val = twoBytes;
 				pitchWheel.changed = true;
 				}

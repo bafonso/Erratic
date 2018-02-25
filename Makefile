@@ -1,5 +1,5 @@
 SLUG = MPE
-VERSION = 0.5.0
+VERSION = 0.5.1
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
@@ -9,6 +9,13 @@ CXXFLAGS +=
 # Careful about linking to shared libraries, since you can't assume much about the user's environment and library search path.
 # Static libraries are fine.
 LDFLAGS +=
+
+# Needed in order to compile on Windows (Daniele Zerbini)
+# see https://www.facebook.com/groups/vcvrack/permalink/155099375150215/
+include ../../arch.mk
+ifeq ($(ARCH), win)
+LDFLAGS += -L"../../dep/lib" -lrtmidi
+endif
 
 # Add .cpp and .c files to the build
 SOURCES += $(wildcard src/*.cpp)

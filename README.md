@@ -1,9 +1,15 @@
 
 # MPE to CV modules
 
+<<<<<<< HEAD
 These are VCVRack modules designed for using "[MIDI Polyphonic Expression](https://www.midi.org/articles/midi-polyphonic-expression-mpe)" (MPE) controllers such as the Haken Continuum, LinnStrument, Madrona Labs Soundplane and ROLI devices with VCV Rack.
 
 We currently have a monophonic and Quad MPE to CV modules with several outputs and configuration options designed to adapt to different MPE controllers.
+=======
+These are VCVRack modules designed for using "Multidimensional Polyphonic Expression" (MPE) controllers such as the Haken Continuum, Linnstrument, Madrona Labs Soundplane and Roli devices with VCV Rack.
+
+We currently have a monophonic and Quad MPE to CV modules with several outputs and configuration options designed to adapt to different MPE controllers
+>>>>>>> v0.5
 
 ## New Quad module
 
@@ -20,7 +26,11 @@ Just download for you architecture and unzip in your _**Rack**_ folder located i
 
 
 ## 2. Outputs and details
+<<<<<<< HEAD
 1V/oct: Note you play combined with 14bit pitchwheel information. Adjust the pitch bend range (in semitones) to match your controller. Note that you can "slide" over 96 semitones using the current standard!
+=======
+1V/oct : Note you play combined with 14bit pitchwheel information. Adjust the pitch bend range (in semitones) to match your controller. Note that you can "slide" over 96 semitones using the current standard!
+>>>>>>> v0.5
 
 Gate: Note On/Off 
 
@@ -33,6 +43,13 @@ Y axis: 0-10V representation of CC 74 (7 bit resolution) on the selected channel
 Pedal: 0-10V representation of CC 12 on global channel (1 or 16). 
 
 # MPE and MPE+
+<<<<<<< HEAD
 The Haken Continuum supports 14bit MPE for both pressure and Y control by using two 7bit CC (MSB and LSB). Let me know if your other controllers have this and we need to support different combinations of CC #s.
 
 See also http://www.rogerlinndesign.com/mpe.html
+=======
+The Haken Continuum supports 14bit MPE for both pressure and Y control by using two 7bit CC (MSB and LSB). Let me know if you other controllers have this and we need to support different combinations of CC #s.
+
+See also http://www.rogerlinndesign.com/mpe.html 
+
+>>>>>>> v0.5
