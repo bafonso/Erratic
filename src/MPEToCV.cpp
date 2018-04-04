@@ -235,6 +235,7 @@ MPEToCVWidget::MPEToCVWidget(MPEToCV *module) : ModuleWidget(module) {
 		Label *label = new Label();
 		label->box.pos = Vec(box.size.x - margin - 7 * 15, margin);
 		label->text = "MPE to CV";
+		label->color = nvgRGB(0x00, 0x00, 0x00);
 		addChild(label);
 		yPos = labelHeight * 2;
 	}
@@ -255,8 +256,8 @@ MPEToCVWidget::MPEToCVWidget(MPEToCV *module) : ModuleWidget(module) {
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
 		label->text = labels[i];
+		label->color = nvgRGB(0x00, 0x00, 0x00);
 		addChild(label);
-
 		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, i));
 
 		yPos += yGap + 2*margin;

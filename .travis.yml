@@ -21,7 +21,7 @@ install:
   fi
 - if [ $TRAVIS_OS_NAME == osx ]; then brew install librtlsdr libusb; fi
 before_script:
-- git clone https://github.com/VCVRack/Rack.git /tmp/Rack || cd /tmp/Rack && git pull
+- git clone https://github.com/VCVRack/Rack.git /tmp/Rack || cd /tmp/Rack && git pull && git checkout v0.6
 - cd /tmp/Rack
 - git submodule update --init --recursive
 - if [ $TRAVIS_OS_NAME == linux ]; then export CC=gcc-7 && CXX=g++-7; fi
