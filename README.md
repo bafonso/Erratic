@@ -14,7 +14,7 @@ I have just added a new Quad module. It is a bit more robust than the previous m
 
 ## 1. Installation 
 
-You can find the latest release here: https://github.com/bafonso/MPE/releases
+You can find the latest release here: https://github.com/bafonso/Erratic/releases
 Just download for you architecture and unzip in your _**Rack**_ folder located in your documents.
 
 
