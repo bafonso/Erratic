@@ -1,21 +1,13 @@
-// #include <list>
 #include <algorithm>
-//#include "rtmidi/RtMidi.h"
-#include "MPE.hpp"
-#include "MidiIO.hpp"
+#include "Erratic.hpp"
+#include "midi.hpp"
 #include "dsp/digital.hpp"
+#include "MPEBaseWidget.hpp"
 
-//static const int polyphony = 4;
 
-// using namespace rack;
-
-/*
- * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
- * CV
- */
 struct MidiValue {
 	int val = 0; // Controller value
-	TransitionSmoother tSmooth;
+	// TransitionSmoother tSmooth;
 	bool changed = false; // Value has been changed by midi message (only if it is in sync!)
 };
 
@@ -52,7 +44,7 @@ struct MPEChannel { // This contains the required info for each channel, each no
 	bool changed = false;
 };
 
-struct QuadMPEToCVInterface : MidiIO, Module {
+struct QuadMPEToCV : Module {
 	enum ParamIds {
 		RESET_PARAM,
 		NUM_PARAMS,
@@ -79,6 +71,8 @@ struct QuadMPEToCVInterface : MidiIO, Module {
 		NUM_LIGHTS
 	};
 
+	MidiInputQueue midiInput;
+
 	int polyphony = 4;
 	std::vector<MPEChannel> mpeChannels;
 	// MPEChannel mpeChannels[4] ; // using this here instead of a container
@@ -96,11 +90,9 @@ struct QuadMPEToCVInterface : MidiIO, Module {
 
 	MidiPedalValue midiPedalOne ;
 
-	//bool gate = false;
-
 	SchmittTrigger resetTrigger;
 
-	QuadMPEToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	QuadMPEToCV() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		// for (int p=0; p < polyphony ; p++) {
 		// 	pitchWheel[p].val = 64;
 		// 	//pitchWheel[p].tSmooth.set(0, 0);
@@ -110,7 +102,7 @@ struct QuadMPEToCVInterface : MidiIO, Module {
 		this->setupMIDIChannels();
 	}
 
-	~QuadMPEToCVInterface() {
+	~QuadMPEToCV() {
 	};
 
 	void step() override;
@@ -119,12 +111,11 @@ struct QuadMPEToCVInterface : MidiIO, Module {
 
 	void releaseNote(MidiNote note);
 
-	void processMidi(std::vector<unsigned char> msg);
+	void processMessage(MidiMessage msg) ;
 
 	void setupMIDIChannels();
 
 	void fromJson(json_t *rootJ) override {
-		baseFromJson(rootJ);
 		json_t *bendRangeJ = json_object_get(rootJ, "bendRange");
 		if (bendRangeJ)
 			bendRange = json_integer_value(bendRangeJ);
@@ -150,7 +141,6 @@ struct QuadMPEToCVInterface : MidiIO, Module {
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		addBaseJson(rootJ);
 		// Semitones
 		// std::cout<< "We set bendRange to " << bendRange << std::endl;
 		json_object_set_new(rootJ, "noteOffReset", json_boolean(noteOffReset));
@@ -162,15 +152,20 @@ struct QuadMPEToCVInterface : MidiIO, Module {
 	}
 
 
-	void reset() override {
-		resetMidi();
-	}
+	// void reset() override {
+	// 	resetMidi();
+	// }
 
-	void resetMidi() override;
+	// void resetMidi() override;
 
 };
 
-void QuadMPEToCVInterface::setupMIDIChannels() {
+struct QuadMPEToCVWidget : ModuleWidget {
+	QuadMPEToCVWidget(QuadMPEToCV *module);
+};
+
+
+void QuadMPEToCV::setupMIDIChannels() {
 	// std::cout << " Setting up MIDI channels with baseMIDIChannel set to " << baseMIDIChannel << std::endl;
 	for (int p=0 ; p < polyphony ; p++) {
 		// std::cout << " p MIDIChannel " << p << " " << p + baseMIDIChannel - 1 << std::endl;
@@ -178,40 +173,44 @@ void QuadMPEToCVInterface::setupMIDIChannels() {
 	}
 }
 
-void QuadMPEToCVInterface::resetMidi() {
-	for (int p=0; p < polyphony ; p++) {
-		mpeChannels[p].mod.val = 0;
-		mpeChannels[p].pitchWheel.val = 0;
-		mpeChannels[p].afterTouch.val = 0;
-	}
+// void QuadMPEToCV::resetMidi() {
+// 	for (int p=0; p < polyphony ; p++) {
+// 		mpeChannels[p].mod.val = 0;
+// 		mpeChannels[p].pitchWheel.val = 0;
+// 		mpeChannels[p].afterTouch.val = 0;
+// 	}
 
 
 
-	// mod.val = 0;
-	// mod.tSmooth.set(0, 0);
-	// pitchWheel.val = 64;
-	// pitchWheel.tSmooth.set(0, 0);
-	// afterTouch.val = 0;
-	// afterTouch.tSmooth.set(0, 0);
-	//vel = 0;
-	//gate = false;
-	//notes.clear();
-}
+// 	// mod.val = 0;
+// 	// mod.tSmooth.set(0, 0);
+// 	// pitchWheel.val = 64;
+// 	// pitchWheel.tSmooth.set(0, 0);
+// 	// afterTouch.val = 0;
+// 	// afterTouch.tSmooth.set(0, 0);
+// 	//vel = 0;
+// 	//gate = false;
+// 	//notes.clear();
+// }
 
-void QuadMPEToCVInterface::step() {
-	if (isPortOpen()) {
-		std::vector<unsigned char> message;
-		int msgsProcessed = 0;
+void QuadMPEToCV::step() {
+	// if (isPortOpen()) {
+	// 	std::vector<unsigned char> message;
+	// 	int msgsProcessed = 0;
 
-		// midiIn->getMessage returns empty vector if there are no messages in the queue
-		// Original Midi to CV limits processing to 4 midi msgs, we should log how many we do at a time to look for
-		// potential issues, specially with MPE+
-		getMessage(&message);
-		while (msgsProcessed < 4 && message.size() > 0) {
-			processMidi(message);
-			getMessage(&message);
-			msgsProcessed++;
-		}
+	// 	// midiIn->getMessage returns empty vector if there are no messages in the queue
+	// 	// Original Midi to CV limits processing to 4 midi msgs, we should log how many we do at a time to look for
+	// 	// potential issues, specially with MPE+
+	// 	getMessage(&message);
+	// 	while (msgsProcessed < 4 && message.size() > 0) {
+	// 		processMidi(message);
+	// 		getMessage(&message);
+	// 		msgsProcessed++;
+	// 	}
+	// }
+	MidiMessage msg;
+	while (midiInput.shift(&msg)) {
+		processMessage(msg);
 	}
 
 	// if (resetTrigger.process(params[RESET_PARAM].value)) {
@@ -334,53 +333,11 @@ void QuadMPEToCVInterface::step() {
 	*/
 }
 
-// void QuadMPEToCVInterface::pressNote(MidiNote note) {
-// 	// std::cout << "Oh yeah" << std::endl;
-// 	mpeChannels[note.ci].pitch = note.pitch;
-// 	mpeChannels[note.ci].newNote = true;
-// 	mpeChannels[note.ci].gate = note.gate;
-// 	mpeChannels[note.ci].changed = true;
-// }
-
-// void QuadMPEToCVInterface::releaseNote(MidiNote note) {
-// 	// std::cout << "Oh yeah" << std::endl;
-// 	mpeChannels[note.ci].newNote = true;
-// 	mpeChannels[note.ci].gate = note.gate;
-// 	mpeChannels[note.ci].changed = true;
-// }
-
-// void QuadMPEToCVInterface::releaseNote(MidiNote note) {
-// 	// Remove existing similar note
-// 	mpeChannels[channel].note = 0;
-// 	mpeChannels[channel].gate = false;
-// 	mpeChannels[channel].changed = true;
-// }
-
-// void QuadMPEToCVInterface::releaseNote(int note) {
-// 	// Remove the note
-// 	auto it = std::find(notes.begin(), notes.end(), note);
-// 	if (it != notes.end())
-// 		notes.erase(it);
-
-// 	if (pedal) {
-// 		// Don't release if pedal is held
-// 		gate = true;
-// 	} else if (!notes.empty()) {
-// 		// Play previous note
-// 		auto it2 = notes.end();
-// 		it2--;
-// 		this->note = *it2;
-// 		gate = true;
-// 	} else {
-// 		gate = false;
-// 	}
-// }
-
-void QuadMPEToCVInterface::processMidi(std::vector<unsigned char> msg) {
-	int channel = msg[0] & 0xf; // starts at 0
-	int status = (msg[0] >> 4) & 0xf;
-	int data1 = msg[1];
-	int data2 = msg[2];
+void QuadMPEToCV::processMessage(MidiMessage msg) {
+	int8_t channel = msg.channel(); // starts at 0
+	int8_t status = msg.status(); //(msg[0] >> 4) & 0xf;
+	int8_t data1 = msg.data1;
+	int8_t data2 = msg.data2;
 	
 	if (status == 0xb && ( data1 == 111 || data1 == 118)) {
 		return;
@@ -451,7 +408,7 @@ void QuadMPEToCVInterface::processMidi(std::vector<unsigned char> msg) {
 				// We want 2 bytes but variable size may change with platform, maybe we should do a more robust way
 				uint16_t twoBytes ; // Initialize our final pitchWheel variable.
 				// we don't need to shift the first byte because it's 7 bit (always starts with 0)
-				twoBytes = ( (uint16_t)msg[2] << 7) | ( (uint16_t)msg[1] ) ;
+				twoBytes = ( (uint16_t)msg.data2 << 7) | ( (uint16_t)msg.data1 ) ;
 				// std::cout << "Pitch wheel " << twoBytes << " on channel and -1 : " << channel << " " << channel -1 << std::endl;
 				mpeChannels[ci].pitchWheel.val = twoBytes;
 				mpeChannels[ci].changed = true;
@@ -599,4 +556,218 @@ void QuadMPEToCVInterface::processMidi(std::vector<unsigned char> msg) {
 }
 
 
+// MPEMidiWidget stuff
 
+struct BendRangeItem : MenuItem {
+	QuadMPEToCV *quadmpetocv;
+	int bendRange ;
+	void onAction(EventAction &e) override {
+		quadmpetocv->bendRange = bendRange;
+	}
+};
+
+struct BendRangeChoice : LedDisplayChoice {
+	// QuadMPEToCVWidget *quadmpetocvwidget;
+	QuadMPEToCV *quadmpetocv;
+	
+	int bendRange ;
+	void onAction(EventAction &e) override {
+			Menu *menu = gScene->createMenu();
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Bend Range"));
+			std::vector<int> bendRanges = {1,2,3,4,12,24,48,96}; // The bend range we use
+			for (auto const& bendRangeValue: bendRanges) {
+				BendRangeItem *item = new BendRangeItem();
+				item->quadmpetocv = quadmpetocv;
+				item->text = std::to_string(bendRangeValue);
+				item->bendRange = bendRangeValue;
+				menu->addChild(item);
+			}
+		// quadmpetocv->bendRange = bendRange;
+	}
+	void step() override {
+		color = nvgRGB(0xff, 0x00, 0x00);
+		color.a = 0.8f;
+		text = stringf("%d", quadmpetocv->bendRange);
+		// text = stringf("Range: %d semitones", quadmpetocv->bendRange);
+		// rightText = (quadmpetocv->bendRange==bendRange) ? "✔" : "";
+	}
+};
+
+struct MidiChannelItem : MenuItem {
+	QuadMPEToCV *quadmpetocv;
+	int channel ;
+	void onAction(EventAction &e) override {
+		quadmpetocv->baseMIDIChannel = channel;
+	}
+};
+
+struct MidiChannelChoice : LedDisplayChoice {
+	// QuadMPEToCVWidget *quadmpetocvwidget;
+	QuadMPEToCV *quadmpetocv;
+	
+	int channel ;
+	void onAction(EventAction &e) override {
+			Menu *menu = gScene->createMenu();
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Midi channel"));
+			std::vector<int> bendRanges = {1,2,3,4,12,24,48,96}; // The bend range we use
+			for (int c=1; c <= 16 ; c++) {
+				MidiChannelItem *item = new MidiChannelItem();
+				item->quadmpetocv = quadmpetocv;
+				item->text = std::to_string(c);
+				item->channel = c;
+				menu->addChild(item);
+			}
+	}
+	void step() override {
+		color = nvgRGB(0xff, 0x00, 0x00);
+		color.a = 0.8f;
+		text = std::to_string(quadmpetocv->baseMIDIChannel);
+	}
+};
+
+struct GlobalMidiChannelItem : MenuItem {
+	QuadMPEToCV *quadmpetocv;
+	int channel ;
+	void onAction(EventAction &e) override {
+		quadmpetocv->globalMIDIChannel = channel;
+	}
+};
+
+struct GlobalMidiChannelChoice : LedDisplayChoice {
+	// QuadMPEToCVWidget *quadmpetocvwidget;
+	QuadMPEToCV *quadmpetocv;
+	
+	int channel ;
+	void onAction(EventAction &e) override {
+			Menu *menu = gScene->createMenu();
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Global Midi channel"));
+			for (int c=1; c <= 16 ; c++) {
+				GlobalMidiChannelItem *item = new GlobalMidiChannelItem();
+				item->quadmpetocv = quadmpetocv;
+				item->text = std::to_string(c);
+				item->channel = c;
+				menu->addChild(item);
+			}
+	}
+	void step() override {
+		color = nvgRGB(0xff, 0x00, 0x00);
+		color.a = 0.8f;
+		text = std::to_string(quadmpetocv->globalMIDIChannel);
+	}
+};
+
+struct MPEModeItem : MenuItem {
+	QuadMPEToCV *quadmpetocv;
+	bool MPEPlus ;
+	void onAction(EventAction &e) override {
+		quadmpetocv->MPEPlus = MPEPlus;
+	}
+};
+
+struct MPEModeChoice : LedDisplayChoice {
+	// QuadMPEToCVWidget *quadmpetocvwidget;
+	QuadMPEToCV *quadmpetocv;
+	
+	bool MPEPlus ;
+	void onAction(EventAction &e) override {
+			Menu *menu = gScene->createMenu();
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MPE mode"));			
+			// MPE
+			MPEModeItem *MPE = new MPEModeItem();
+			MPE->quadmpetocv = quadmpetocv;
+			MPE->text = "MPE - Standard (ROLI, etc)";
+			MPE->MPEPlus = false;
+			menu->addChild(MPE);
+			// MPE Plus
+			MPEModeItem *MPEPlus = new MPEModeItem();
+			MPEPlus->quadmpetocv = quadmpetocv;
+			MPEPlus->text = "MPE+ - High Res for Haken Continuum";
+			MPEPlus->MPEPlus = true;
+			menu->addChild(MPEPlus);
+
+	}
+	void step() override {
+		// color = nvgRGB(0xff, 0x00, 0x00);
+		// color.a = 0.8f;
+		if (quadmpetocv->MPEPlus) {
+			text = "MPE+";
+		} else {
+			text = "MPE";
+		}		
+	}
+};
+
+// We extend the midi to follow similar design
+struct QuadMPEMidiWidget : MPEBaseWidget {
+	LedDisplaySeparator *hSeparators[2];
+	LedDisplaySeparator *vSeparators[3];
+	// LedDisplayChoice *ccChoices[4][4];
+	QuadMPEToCV *quadmpetocv ;
+	BendRangeChoice *bendRangeChoice ;
+	MidiChannelChoice *midiChannelChoice ;
+	GlobalMidiChannelChoice *globalMidiChannelChoice ;
+	MPEModeChoice *mpeModeChoice ;
+
+	QuadMPEMidiWidget() {
+	}
+
+	void initialize(QuadMPEToCV *quadmpetocv) {
+		this->quadmpetocv = quadmpetocv;
+		Vec pos = deviceChoice->box.getBottomLeft();
+		for (int y = 0; y < 2; y++) {
+			hSeparators[y] = Widget::create<LedDisplaySeparator>(pos);
+			addChild(hSeparators[y]);
+		}
+
+		midiChannelChoice = Widget::create<MidiChannelChoice>(pos);
+		midiChannelChoice->quadmpetocv = quadmpetocv ;
+		addChild(midiChannelChoice);
+
+		globalMidiChannelChoice = Widget::create<GlobalMidiChannelChoice>(pos);
+		globalMidiChannelChoice->quadmpetocv = quadmpetocv ;
+		addChild(globalMidiChannelChoice);
+
+		bendRangeChoice = Widget::create<BendRangeChoice>(pos);
+		bendRangeChoice->quadmpetocv = quadmpetocv ;
+		addChild(bendRangeChoice);
+
+		mpeModeChoice = Widget::create<MPEModeChoice>(pos);
+		mpeModeChoice->quadmpetocv = quadmpetocv ;
+		addChild(mpeModeChoice);
+
+
+		for (int x = 1; x < 4; x++) {
+			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
+			addChild(vSeparators[x]);
+		}
+
+		for (int x = 1; x < 4; x++) {
+			vSeparators[x]->box.size.y = midiChannelChoice->box.size.y;
+
+		}
+	}
+	void step() override {
+		MPEBaseWidget::step();
+		
+		midiChannelChoice->box.size.x = box.size.x/4;
+		midiChannelChoice->box.pos.x = 0;
+
+		globalMidiChannelChoice->box.size.x = box.size.x/4;
+		globalMidiChannelChoice->box.pos.x = box.size.x/4;
+
+		bendRangeChoice->box.size.x = box.size.x/4;
+		bendRangeChoice->box.pos.x = box.size.x/4 * 2 ;
+		
+		mpeModeChoice->box.size.x = box.size.x/4;
+		mpeModeChoice->box.pos.x = box.size.x/4 * 3 - 5 ;
+
+		for (int y = 0; y < 2; y++) {
+			hSeparators[y]->box.size.x = box.size.x;
+		}
+		
+		for (int x = 1; x < 4; x++) {
+			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
+		}
+		
+	}
+};
