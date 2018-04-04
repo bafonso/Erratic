@@ -152,6 +152,9 @@ QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 	// QuadMPEToCV *module = new QuadMPEToCV();
 	// setModule(module);
 	box.size = Vec(16 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+	
+	Vec pos = Vec();
+	MPEMidiWidget *mpemidiWidget ;
 
 	{
 		SVGPanel *panel = new SVGPanel();
@@ -169,6 +172,15 @@ QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
 	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
 
+	mpemidiWidget = Widget::create<MPEMidiWidget>(mm2px(Vec(5.41891, 11)));
+	mpemidiWidget->initialize(module);
+	mpemidiWidget->box.size = mm2px(Vec(60, 28));
+	// box.size = mm2px(Vec(44, 28));
+	mpemidiWidget->midiIO = &module->midiInput;
+	addChild(mpemidiWidget);
+	pos = mpemidiWidget->box.getBottomLeft();
+
+
 
 		// MidiChoice *midiChoice = new MidiChoice();
 		// midiChoice->midiModule = dynamic_cast<MidiIO *>(module);
@@ -178,8 +190,7 @@ QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 		// yPos += midiChoice->box.size.y + 4*margin;
 
 
-	yPos += labelHeight + margin * 2;
-	yPos = 115 ;
+	yPos = mpemidiWidget->box.pos.y + mpemidiWidget->box.size.y + 6*margin ;
 
 	std::string labels[QuadMPEToCV::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Pressure", "Y axis"} ;
 	for (int i = 0; i < 5 ; i++) {
