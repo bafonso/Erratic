@@ -15,11 +15,11 @@ addons:
     packages:
     - g++-7
 install:
-- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install librtlsdr-dev git libx11-dev
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install git libx11-dev
   libxrandr-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev libglu1-mesa-dev zlib1g-dev
-  libasound2-dev libgtk2.0-dev unzip cmake3 libudev-dev libusb-dev libusb-1.0-0-dev;
+  libasound2-dev libgtk2.0-dev unzip cmake3 libudev-dev ;
   fi
-- if [ $TRAVIS_OS_NAME == osx ]; then brew install librtlsdr libusb; fi
+#- if [ $TRAVIS_OS_NAME == osx ]; then brew install librtlsdr libusb; fi
 before_script:
 - git clone --branch=v0.6 https://github.com/VCVRack/Rack.git /tmp/Rack || cd /tmp/Rack && git pull
 - cd /tmp/Rack
