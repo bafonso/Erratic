@@ -16,4 +16,4 @@ install:
 - pacman -S --noconfirm zip unzip mingw-w64-x86_64-cmake
 
 build_script:
-- bash -l %APPVEYOR_BUILD_FOLDER%\script\appveyor-build.sh
+- bash -l %APPVEYOR_BUILD_FOLDER%\scripts\appveyor-build.sh
