@@ -1,0 +1,50 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+test: off
+
+environment:
+  MSYSTEM: MINGW64
+  VCV_RACK_COMMIT: v0.6
+
+artifacts:
+  - path: dist\*.zip
+
+cache:
+  - c:\tmp\Rack
+
+install:
+- set PATH=C:\msys64\usr\bin;%PATH%
+- pacman -S --noconfirm zip unzip mingw-w64-x86_64-cmake
+
+build_script:
+- cmd: >-
+
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o xtrace
+
+echo "MSYSTEM=${MSYSTEM}"
+export VCV_PLUGIN_NAME=Erratic
+export VCV_PLUGIN_DIR="${APPVEYOR_BUILD_FOLDER}"
+export VCV_RACK_DIR=/c/tmp/Rack
+#export VCV_RACK_COMMIT=v0.6
+export VCV_HOME_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+env | sort
+
+mkdir -p "${VCV_RACK_DIR}" \
+git clone -n https://github.com/VCVRack/Rack.git "${VCV_RACK_DIR}" || true
+cd "${VCV_RACK_DIR}"
+git checkout ${VCV_RACK_COMMIT}
+git pull
+git submodule update --init --recursive
+
+make dep > /dev/null
+make
+
+cd "${VCV_PLUGIN_DIR}"
+
+make clean test dist RACK_DIR="${VCV_RACK_DIR}"
+
+#- bash -l %APPVEYOR_BUILD_FOLDER%\script\appveyor-build.sh
