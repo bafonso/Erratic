@@ -299,16 +299,14 @@ struct MPEMidiWidget : MPEBaseWidget {
 		mpeModeChoice->mpetocv = mpetocv ;
 		addChild(mpeModeChoice);
 
-
-		for (int x = 1; x < 4; x++) {
+		for (int x = 0; x < 3; x++) {
 			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
+			vSeparators[x]->box.size.y = midiChannelChoice->box.size.y;
 			addChild(vSeparators[x]);
 		}
 
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x]->box.size.y = midiChannelChoice->box.size.y;
-
-		}
+		// for (int x = 0; x < 3; x++) {
+		// }
 	}
 	void step() override {
 		MPEBaseWidget::step();
@@ -329,8 +327,8 @@ struct MPEMidiWidget : MPEBaseWidget {
 			hSeparators[y]->box.size.x = box.size.x;
 		}
 		
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
+		for (int x = 0; x < 3; x++) {
+			vSeparators[x]->box.pos.x = box.size.x / 4 * (x+1);
 		}
 		
 	}
