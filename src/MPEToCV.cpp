@@ -68,37 +68,37 @@ void MPEToCV::step() {
 	}	
 }
 
-void MPEToCV::pressNote(int note) {
-	// Remove existing similar note
-	auto it = std::find(notes.begin(), notes.end(), note);
-	if (it != notes.end())
-		notes.erase(it);
-	// Push note
-	notes.push_back(note);
-	this->note = note;
-	gate = true;
-	this->newNote = true;
-}
+// void MPEToCV::pressNote(int note) {
+// 	// Remove existing similar note
+// 	auto it = std::find(notes.begin(), notes.end(), note);
+// 	if (it != notes.end())
+// 		notes.erase(it);
+// 	// Push note
+// 	notes.push_back(note);
+// 	this->note = note;
+// 	gate = true;
+// 	this->newNote = true;
+// }
 
-void MPEToCV::releaseNote(int note) {
-	// Remove the note
-	auto it = std::find(notes.begin(), notes.end(), note);
-	if (it != notes.end())
-		notes.erase(it);
+// void MPEToCV::releaseNote(int note) {
+// 	// Remove the note
+// 	auto it = std::find(notes.begin(), notes.end(), note);
+// 	if (it != notes.end())
+// 		notes.erase(it);
 
-	if (pedal) {
-		// Don't release if pedal is held
-		gate = true;
-	} else if (!notes.empty()) {
-		// Play previous note
-		auto it2 = notes.end();
-		it2--;
-		this->note = *it2;
-		gate = true;
-	} else {
-		gate = false;
-	}
-}
+// 	if (pedal) {
+// 		// Don't release if pedal is held
+// 		gate = true;
+// 	} else if (!notes.empty()) {
+// 		// Play previous note
+// 		auto it2 = notes.end();
+// 		it2--;
+// 		this->note = *it2;
+// 		gate = true;
+// 	} else {
+// 		gate = false;
+// 	}
+// }
 
 void MPEToCV::processMessage(MidiMessage msg) {
 	// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
