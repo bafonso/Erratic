@@ -257,7 +257,7 @@ struct MPEModeChoice : LedDisplayChoice {
 			text = "MPE+";
 		} else {
 			text = "MPE";
-		}		
+		}
 	}
 };
 

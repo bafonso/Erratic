@@ -101,13 +101,13 @@ void MPEToCV::releaseNote(int note) {
 }
 
 void MPEToCV::processMessage(MidiMessage msg) {
-	debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
+	// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
 	int8_t channel = msg.channel();
 	int8_t status = msg.status();
 	int8_t data1 = msg.data1;
 	int8_t data2 = msg.data2;
 
-	fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
+	// fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
 
 	// Filter channels
 	if (this->channel == (channel + 1) ) { // Only process the channel we want

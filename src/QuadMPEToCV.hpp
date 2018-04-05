@@ -115,41 +115,73 @@ struct QuadMPEToCV : Module {
 
 	void setupMIDIChannels();
 
-	void fromJson(json_t *rootJ) override {
-		json_t *bendRangeJ = json_object_get(rootJ, "bendRange");
-		if (bendRangeJ)
-			bendRange = json_integer_value(bendRangeJ);
-		
-		json_t *baseMIDIChannelJ = json_object_get(rootJ, "baseMIDIChannel");
-		if (baseMIDIChannelJ)
-			baseMIDIChannel = json_integer_value(baseMIDIChannelJ);
-		
-		json_t *globalMIDIChannelJ = json_object_get(rootJ, "globalMIDIChannel");
-		if (globalMIDIChannelJ)
-			globalMIDIChannel = json_integer_value(globalMIDIChannelJ);
-
-		json_t *noteOffResetJ = json_object_get(rootJ, "noteOffReset");
-		if (noteOffResetJ)
-			noteOffReset = json_boolean_value(noteOffResetJ);
-
-		json_t *MPEPlusModeJ = json_object_get(rootJ, "MPEPlusMode");
-		if (MPEPlusModeJ)
-			MPEPlus = json_boolean_value(MPEPlusModeJ);
-
-		this->setupMIDIChannels();
-	}
-
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		// Semitones
-		// std::cout<< "We set bendRange to " << bendRange << std::endl;
-		json_object_set_new(rootJ, "noteOffReset", json_boolean(noteOffReset));
-		json_object_set_new(rootJ, "MPEPlusMode", json_boolean(MPEPlus));
+		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		json_object_set_new(rootJ, "bendRange", json_integer(bendRange));
 		json_object_set_new(rootJ, "baseMIDIChannel", json_integer(baseMIDIChannel));
-		json_object_set_new(rootJ, "globalMIDIChannel", json_integer(globalMIDIChannel));
-		return rootJ;
+		json_object_set_new(rootJ, "globalMidiChannel", json_integer(globalMIDIChannel));
+		json_object_set_new(rootJ, "MPEMode", json_integer(MPEPlus));
+		return rootJ;	
 	}
+
+	void fromJson(json_t *rootJ) override {
+		json_t *midiJ = json_object_get(rootJ, "midi");
+		midiInput.fromJson(midiJ);
+		json_t *bendRangeJ = json_object_get(rootJ, "bendRange");
+		if (bendRangeJ) {
+			bendRange = json_integer_value(bendRangeJ);
+		}
+		json_t *baseMIDIChannelJ = json_object_get(rootJ, "baseMIDIChannel");
+		if (baseMIDIChannelJ) {
+			baseMIDIChannel = json_integer_value(baseMIDIChannelJ);
+		}
+		json_t *globalMidiChannelJ = json_object_get(rootJ, "globalMidiChannel");
+		if (globalMidiChannelJ) {
+			globalMIDIChannel = json_integer_value(globalMidiChannelJ);
+		}
+		json_t *MPEModeJ = json_object_get(rootJ, "MPEMode");
+		if (MPEModeJ) {
+			MPEPlus = json_integer_value(MPEModeJ);
+		}
+	}
+
+
+	// void fromJson(json_t *rootJ) override {
+	// 	json_t *bendRangeJ = json_object_get(rootJ, "bendRange");
+	// 	if (bendRangeJ)
+	// 		bendRange = json_integer_value(bendRangeJ);
+		
+	// 	json_t *baseMIDIChannelJ = json_object_get(rootJ, "baseMIDIChannel");
+	// 	if (baseMIDIChannelJ)
+	// 		baseMIDIChannel = json_integer_value(baseMIDIChannelJ);
+		
+	// 	json_t *globalMIDIChannelJ = json_object_get(rootJ, "globalMIDIChannel");
+	// 	if (globalMIDIChannelJ)
+	// 		globalMIDIChannel = json_integer_value(globalMIDIChannelJ);
+
+	// 	json_t *noteOffResetJ = json_object_get(rootJ, "noteOffReset");
+	// 	if (noteOffResetJ)
+	// 		noteOffReset = json_boolean_value(noteOffResetJ);
+
+	// 	json_t *MPEPlusModeJ = json_object_get(rootJ, "MPEPlusMode");
+	// 	if (MPEPlusModeJ)
+	// 		MPEPlus = json_boolean_value(MPEPlusModeJ);
+
+	// 	this->setupMIDIChannels();
+	// }
+
+	// json_t *toJson() override {
+	// 	json_t *rootJ = json_object();
+	// 	// Semitones
+	// 	// std::cout<< "We set bendRange to " << bendRange << std::endl;
+	// 	json_object_set_new(rootJ, "noteOffReset", json_boolean(noteOffReset));
+	// 	json_object_set_new(rootJ, "MPEPlusMode", json_boolean(MPEPlus));
+	// 	json_object_set_new(rootJ, "bendRange", json_integer(bendRange));
+	// 	json_object_set_new(rootJ, "baseMIDIChannel", json_integer(baseMIDIChannel));
+	// 	json_object_set_new(rootJ, "globalMIDIChannel", json_integer(globalMIDIChannel));
+	// 	return rootJ;
+	// }
 
 
 	// void reset() override {
@@ -558,15 +590,16 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 
 // MPEMidiWidget stuff
 
-struct BendRangeItem : MenuItem {
+struct QuadBendRangeItem : MenuItem {
 	QuadMPEToCV *quadmpetocv;
 	int bendRange ;
 	void onAction(EventAction &e) override {
+		// debug("We trigger action with %d", bendRange);
 		quadmpetocv->bendRange = bendRange;
 	}
 };
 
-struct BendRangeChoice : LedDisplayChoice {
+struct QuadBendRangeChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
 	
@@ -576,7 +609,7 @@ struct BendRangeChoice : LedDisplayChoice {
 			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Bend Range"));
 			std::vector<int> bendRanges = {1,2,3,4,12,24,48,96}; // The bend range we use
 			for (auto const& bendRangeValue: bendRanges) {
-				BendRangeItem *item = new BendRangeItem();
+				QuadBendRangeItem *item = new QuadBendRangeItem();
 				item->quadmpetocv = quadmpetocv;
 				item->text = std::to_string(bendRangeValue);
 				item->bendRange = bendRangeValue;
@@ -588,12 +621,10 @@ struct BendRangeChoice : LedDisplayChoice {
 		color = nvgRGB(0xff, 0x00, 0x00);
 		color.a = 0.8f;
 		text = stringf("%d", quadmpetocv->bendRange);
-		// text = stringf("Range: %d semitones", quadmpetocv->bendRange);
-		// rightText = (quadmpetocv->bendRange==bendRange) ? "✔" : "";
 	}
 };
 
-struct MidiChannelItem : MenuItem {
+struct QuadMidiChannelItem : MenuItem {
 	QuadMPEToCV *quadmpetocv;
 	int channel ;
 	void onAction(EventAction &e) override {
@@ -601,7 +632,7 @@ struct MidiChannelItem : MenuItem {
 	}
 };
 
-struct MidiChannelChoice : LedDisplayChoice {
+struct QuadMidiChannelChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
 	
@@ -611,7 +642,7 @@ struct MidiChannelChoice : LedDisplayChoice {
 			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Midi channel"));
 			std::vector<int> bendRanges = {1,2,3,4,12,24,48,96}; // The bend range we use
 			for (int c=1; c <= 16 ; c++) {
-				MidiChannelItem *item = new MidiChannelItem();
+				QuadMidiChannelItem *item = new QuadMidiChannelItem();
 				item->quadmpetocv = quadmpetocv;
 				item->text = std::to_string(c);
 				item->channel = c;
@@ -625,7 +656,7 @@ struct MidiChannelChoice : LedDisplayChoice {
 	}
 };
 
-struct GlobalMidiChannelItem : MenuItem {
+struct QuadGlobalMidiChannelItem : MenuItem {
 	QuadMPEToCV *quadmpetocv;
 	int channel ;
 	void onAction(EventAction &e) override {
@@ -633,7 +664,7 @@ struct GlobalMidiChannelItem : MenuItem {
 	}
 };
 
-struct GlobalMidiChannelChoice : LedDisplayChoice {
+struct QuadGlobalMidiChannelChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
 	
@@ -642,7 +673,7 @@ struct GlobalMidiChannelChoice : LedDisplayChoice {
 			Menu *menu = gScene->createMenu();
 			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Global Midi channel"));
 			for (int c=1; c <= 16 ; c++) {
-				GlobalMidiChannelItem *item = new GlobalMidiChannelItem();
+				QuadGlobalMidiChannelItem *item = new QuadGlobalMidiChannelItem();
 				item->quadmpetocv = quadmpetocv;
 				item->text = std::to_string(c);
 				item->channel = c;
@@ -656,7 +687,7 @@ struct GlobalMidiChannelChoice : LedDisplayChoice {
 	}
 };
 
-struct MPEModeItem : MenuItem {
+struct QuadMPEModeItem : MenuItem {
 	QuadMPEToCV *quadmpetocv;
 	bool MPEPlus ;
 	void onAction(EventAction &e) override {
@@ -664,7 +695,7 @@ struct MPEModeItem : MenuItem {
 	}
 };
 
-struct MPEModeChoice : LedDisplayChoice {
+struct QuadMPEModeChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
 	
@@ -673,13 +704,13 @@ struct MPEModeChoice : LedDisplayChoice {
 			Menu *menu = gScene->createMenu();
 			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MPE mode"));			
 			// MPE
-			MPEModeItem *MPE = new MPEModeItem();
+			QuadMPEModeItem *MPE = new QuadMPEModeItem();
 			MPE->quadmpetocv = quadmpetocv;
 			MPE->text = "MPE - Standard (ROLI, etc)";
 			MPE->MPEPlus = false;
 			menu->addChild(MPE);
 			// MPE Plus
-			MPEModeItem *MPEPlus = new MPEModeItem();
+			QuadMPEModeItem *MPEPlus = new QuadMPEModeItem();
 			MPEPlus->quadmpetocv = quadmpetocv;
 			MPEPlus->text = "MPE+ - High Res for Haken Continuum";
 			MPEPlus->MPEPlus = true;
@@ -703,10 +734,10 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 	LedDisplaySeparator *vSeparators[3];
 	// LedDisplayChoice *ccChoices[4][4];
 	QuadMPEToCV *quadmpetocv ;
-	BendRangeChoice *bendRangeChoice ;
-	MidiChannelChoice *midiChannelChoice ;
-	GlobalMidiChannelChoice *globalMidiChannelChoice ;
-	MPEModeChoice *mpeModeChoice ;
+	QuadBendRangeChoice *bendRangeChoice ;
+	QuadMidiChannelChoice *midiChannelChoice ;
+	QuadGlobalMidiChannelChoice *globalMidiChannelChoice ;
+	QuadMPEModeChoice *mpeModeChoice ;
 
 	QuadMPEMidiWidget() {
 	}
@@ -719,19 +750,19 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 			addChild(hSeparators[y]);
 		}
 
-		midiChannelChoice = Widget::create<MidiChannelChoice>(pos);
+		midiChannelChoice = Widget::create<QuadMidiChannelChoice>(pos);
 		midiChannelChoice->quadmpetocv = quadmpetocv ;
 		addChild(midiChannelChoice);
 
-		globalMidiChannelChoice = Widget::create<GlobalMidiChannelChoice>(pos);
+		globalMidiChannelChoice = Widget::create<QuadGlobalMidiChannelChoice>(pos);
 		globalMidiChannelChoice->quadmpetocv = quadmpetocv ;
 		addChild(globalMidiChannelChoice);
 
-		bendRangeChoice = Widget::create<BendRangeChoice>(pos);
+		bendRangeChoice = Widget::create<QuadBendRangeChoice>(pos);
 		bendRangeChoice->quadmpetocv = quadmpetocv ;
 		addChild(bendRangeChoice);
 
-		mpeModeChoice = Widget::create<MPEModeChoice>(pos);
+		mpeModeChoice = Widget::create<QuadMPEModeChoice>(pos);
 		mpeModeChoice->quadmpetocv = quadmpetocv ;
 		addChild(mpeModeChoice);
 
@@ -772,77 +803,77 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 	}
 };
 
-// We extend the midi to follow similar design
-struct MPEMidiWidget : MPEBaseWidget {
-	LedDisplaySeparator *hSeparators[2];
-	LedDisplaySeparator *vSeparators[3];
-	// LedDisplayChoice *ccChoices[4][4];
-	QuadMPEToCV *quadmpetocv ;
-	BendRangeChoice *bendRangeChoice ;
-	MidiChannelChoice *midiChannelChoice ;
-	GlobalMidiChannelChoice *globalMidiChannelChoice ;
-	MPEModeChoice *mpeModeChoice ;
+// // We extend the midi to follow similar design
+// struct MPEMidiWidget : MPEBaseWidget {
+// 	LedDisplaySeparator *hSeparators[2];
+// 	LedDisplaySeparator *vSeparators[3];
+// 	// LedDisplayChoice *ccChoices[4][4];
+// 	QuadMPEToCV *quadmpetocv ;
+// 	BendRangeChoice *bendRangeChoice ;
+// 	MidiChannelChoice *midiChannelChoice ;
+// 	GlobalMidiChannelChoice *globalMidiChannelChoice ;
+// 	MPEModeChoice *mpeModeChoice ;
 
-	MPEMidiWidget() {
-	}
+// 	MPEMidiWidget() {
+// 	}
 
-	void initialize(QuadMPEToCV *quadmpetocv) {
-		this->quadmpetocv = quadmpetocv;
-		Vec pos = deviceChoice->box.getBottomLeft();
-		for (int y = 0; y < 2; y++) {
-			hSeparators[y] = Widget::create<LedDisplaySeparator>(pos);
-			addChild(hSeparators[y]);
-		}
+// 	void initialize(QuadMPEToCV *quadmpetocv) {
+// 		this->quadmpetocv = quadmpetocv;
+// 		Vec pos = deviceChoice->box.getBottomLeft();
+// 		for (int y = 0; y < 2; y++) {
+// 			hSeparators[y] = Widget::create<LedDisplaySeparator>(pos);
+// 			addChild(hSeparators[y]);
+// 		}
 
-		midiChannelChoice = Widget::create<MidiChannelChoice>(pos);
-		midiChannelChoice->quadmpetocv = quadmpetocv ;
-		addChild(midiChannelChoice);
+// 		midiChannelChoice = Widget::create<MidiChannelChoice>(pos);
+// 		midiChannelChoice->quadmpetocv = quadmpetocv ;
+// 		addChild(midiChannelChoice);
 
-		globalMidiChannelChoice = Widget::create<GlobalMidiChannelChoice>(pos);
-		globalMidiChannelChoice->quadmpetocv = quadmpetocv ;
-		addChild(globalMidiChannelChoice);
+// 		globalMidiChannelChoice = Widget::create<GlobalMidiChannelChoice>(pos);
+// 		globalMidiChannelChoice->quadmpetocv = quadmpetocv ;
+// 		addChild(globalMidiChannelChoice);
 
-		bendRangeChoice = Widget::create<BendRangeChoice>(pos);
-		bendRangeChoice->quadmpetocv = quadmpetocv ;
-		addChild(bendRangeChoice);
+// 		bendRangeChoice = Widget::create<BendRangeChoice>(pos);
+// 		bendRangeChoice->quadmpetocv = quadmpetocv ;
+// 		addChild(bendRangeChoice);
 
-		mpeModeChoice = Widget::create<MPEModeChoice>(pos);
-		mpeModeChoice->quadmpetocv = quadmpetocv ;
-		addChild(mpeModeChoice);
+// 		mpeModeChoice = Widget::create<MPEModeChoice>(pos);
+// 		mpeModeChoice->quadmpetocv = quadmpetocv ;
+// 		addChild(mpeModeChoice);
 
 
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
-			addChild(vSeparators[x]);
-		}
+// 		for (int x = 1; x < 4; x++) {
+// 			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
+// 			addChild(vSeparators[x]);
+// 		}
 
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x]->box.size.y = midiChannelChoice->box.size.y;
+// 		for (int x = 1; x < 4; x++) {
+// 			vSeparators[x]->box.size.y = midiChannelChoice->box.size.y;
 
-		}
-	}
-	void step() override {
-		MPEBaseWidget::step();
+// 		}
+// 	}
+// 	void step() override {
+// 		MPEBaseWidget::step();
 		
-		midiChannelChoice->box.size.x = box.size.x/4;
-		midiChannelChoice->box.pos.x = 0;
+// 		midiChannelChoice->box.size.x = box.size.x/4;
+// 		midiChannelChoice->box.pos.x = 0;
 
-		globalMidiChannelChoice->box.size.x = box.size.x/4;
-		globalMidiChannelChoice->box.pos.x = box.size.x/4;
+// 		globalMidiChannelChoice->box.size.x = box.size.x/4;
+// 		globalMidiChannelChoice->box.pos.x = box.size.x/4;
 
-		bendRangeChoice->box.size.x = box.size.x/4;
-		bendRangeChoice->box.pos.x = box.size.x/4 * 2 ;
+// 		bendRangeChoice->box.size.x = box.size.x/4;
+// 		bendRangeChoice->box.pos.x = box.size.x/4 * 2 ;
 		
-		mpeModeChoice->box.size.x = box.size.x/4;
-		mpeModeChoice->box.pos.x = box.size.x/4 * 3 - 5 ;
+// 		mpeModeChoice->box.size.x = box.size.x/4;
+// 		mpeModeChoice->box.pos.x = box.size.x/4 * 3 - 5 ;
 
-		for (int y = 0; y < 2; y++) {
-			hSeparators[y]->box.size.x = box.size.x;
-		}
+// 		for (int y = 0; y < 2; y++) {
+// 			hSeparators[y]->box.size.x = box.size.x;
+// 		}
 		
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
-		}
+// 		for (int x = 1; x < 4; x++) {
+// 			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
+// 		}
 		
-	}
-};
+// 	}
+// };

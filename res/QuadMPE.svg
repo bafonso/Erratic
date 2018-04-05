@@ -53,7 +53,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -181,7 +181,7 @@
            height="164.28572"
            x="-156.42857"
            y="171" /></flowRegion><flowPara
-         id="flowPara4894"></flowPara></flowRoot>    <text
+         id="flowPara4894" /></flowRoot>    <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        x="-19.843752"
@@ -205,7 +205,7 @@
          sodipodi:role="line">gate</tspan></text>
     <g
        id="g5040"
-       transform="translate(1.0583333)">
+       transform="translate(1.0583333,7.4083325)">
       <g
          aria-label="velocity"
          style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:'Myriad Pro';-inkscape-font-specification:'Myriad Pro Semi-Bold';letter-spacing:0px;word-spacing:0px;fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -495,7 +495,7 @@
          aria-label="1"
          style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
          id="text5153"
-         transform="translate(-3.7041668,-0.24129982)">
+         transform="translate(-3.7041668,7.1670328)">
         <path
            d="m 28.213348,27.231144 h 0.503766 v -2.751667 h -0.436033 l -0.668867,0.3302 0.0889,0.3937 0.503767,-0.254 h 0.0085 z"
            style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333311px;font-family:'Myriad Pro';-inkscape-font-specification:'Myriad Pro, Semi-Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;stroke-width:0.26458332"
@@ -506,7 +506,7 @@
          aria-label="2"
          style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
          id="text5161"
-         transform="translate(-0.01693211,-0.24128333)">
+         transform="translate(-0.01693211,7.1670498)">
         <path
            d="m 36.066786,27.254427 v -0.4318 h -1.1303 v -0.0085 l 0.2413,-0.207433 c 0.478367,-0.4445 0.8255,-0.833967 0.8255,-1.316567 0,-0.448733 -0.296333,-0.833966 -0.905933,-0.833966 -0.347134,0 -0.6477,0.122766 -0.846667,0.283633 l 0.1524,0.3683 c 0.1397,-0.105833 0.347133,-0.2286 0.588433,-0.2286 0.359834,0 0.491067,0.2159 0.491067,0.461433 -0.0042,0.364067 -0.309033,0.694267 -0.956733,1.2954 l -0.325967,0.300567 v 0.3175 z"
            style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333311px;font-family:'Myriad Pro';-inkscape-font-specification:'Myriad Pro, Semi-Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;stroke-width:0.26458332"
@@ -517,7 +517,7 @@
          aria-label="3"
          style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
          id="text5165"
-         transform="translate(0.2700255,-0.24128382)">
+         transform="translate(0.2700255,7.1670488)">
         <path
            d="m 44.581534,27.087211 c 0.148167,0.09737 0.436034,0.1905 0.770467,0.1905 0.681567,0 1.071033,-0.3683 1.071033,-0.833967 0,-0.372533 -0.270933,-0.626533 -0.605366,-0.6858 v -0.0085 c 0.338666,-0.118533 0.507999,-0.3556 0.507999,-0.643466 0,-0.359834 -0.292099,-0.6731 -0.859366,-0.6731 -0.3302,0 -0.635,0.1016 -0.791633,0.211666 l 0.118533,0.376767 c 0.1143,-0.0762 0.338667,-0.173567 0.563033,-0.173567 0.300567,0 0.440267,0.156634 0.440267,0.3429 0,0.275167 -0.3048,0.385234 -0.5461,0.385234 h -0.232833 v 0.381 h 0.2413 c 0.3175,0 0.6223,0.1397 0.6223,0.465666 0.0042,0.2159 -0.156634,0.440267 -0.554567,0.440267 -0.262467,0 -0.5207,-0.105833 -0.626533,-0.169333 z"
            style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333311px;font-family:'Myriad Pro';-inkscape-font-specification:'Myriad Pro, Semi-Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;stroke-width:0.26458332"
@@ -528,7 +528,7 @@
          aria-label="4"
          style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
          id="text5169"
-         transform="translate(1.0583333,-0.24129982)">
+         transform="translate(1.0583333,7.1670328)">
         <path
            d="m 56.059919,27.231144 v -0.6985 h 0.3556 v -0.3937 h -0.3556 v -1.659467 h -0.613833 l -1.121833,1.7145 v 0.338667 h 1.244599 v 0.6985 z m -1.240366,-1.0922 0.0042,-0.0085 0.503766,-0.753533 c 0.08467,-0.1524 0.156634,-0.2921 0.2413,-0.465667 h 0.01693 c -0.0127,0.160867 -0.01693,0.321734 -0.01693,0.478367 v 0.7493 z"
            style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333311px;font-family:'Myriad Pro';-inkscape-font-specification:'Myriad Pro, Semi-Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;stroke-width:0.26458332"
