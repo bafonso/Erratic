@@ -36,3 +36,7 @@ Pedal: 0-10V representation of CC 12 on global channel (1 or 16).
 The Haken Continuum supports 14bit MPE for both pressure and Y control by using two 7bit CC (MSB and LSB). Let me know if your other controllers have this and we need to support different combinations of CC #s.
 
 See also http://www.rogerlinndesign.com/mpe.html
+
+# Donations
+
+[Donate through Paypal](https://paypal.me/ErraticModules)
