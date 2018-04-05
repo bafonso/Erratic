@@ -1,4 +1,3 @@
-#include <algorithm>
 #include "Erratic.hpp"
 #include "midi.hpp"
 #include "dsp/digital.hpp"
@@ -767,12 +766,12 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 		addChild(mpeModeChoice);
 
 
-		for (int x = 1; x < 4; x++) {
+		for (int x = 1; x < 3; x++) {
 			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
 			addChild(vSeparators[x]);
 		}
 
-		for (int x = 1; x < 4; x++) {
+		for (int x = 1; x < 3; x++) {
 			vSeparators[x]->box.size.y = midiChannelChoice->box.size.y;
 
 		}
@@ -796,7 +795,7 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 			hSeparators[y]->box.size.x = box.size.x;
 		}
 		
-		for (int x = 1; x < 4; x++) {
+		for (int x = 1; x < 3; x++) {
 			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
 		}
 		

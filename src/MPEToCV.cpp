@@ -193,7 +193,7 @@ void MPEToCV::processMessage(MidiMessage msg) {
 
 	// std::cout <<" midi input is on " << Global channel!"
 	if (this->globalChannel == (channel + 1) ) {
-		std::cout <<"Global channel!" << std::endl;
+		//std::cout <<"Global channel!" << std::endl;
 		if (data1 == midiPedalOne.cc) {
 			std::cout <<"Pedal One value is " << data2 << std::endl;
 			midiPedalOne.val = data2;
@@ -261,7 +261,7 @@ MPEToCVWidget::MPEToCVWidget(MPEToCV *module) : ModuleWidget(module) {
 		label->text = labels[i];
 		label->color = nvgRGB(0x00, 0x00, 0x00);
 		addChild(label);
-		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, i));
+		addOutput(Port::create<PJ3410Port>(Vec(15 * 6, yPos - 5), Port::OUTPUT, module, i));
 
 		yPos += yGap + 2*margin;
 	}

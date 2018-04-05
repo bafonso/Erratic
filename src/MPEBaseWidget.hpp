@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 // #include <jansson.h>
 #include "widgets.hpp"
 #include "ui.hpp"

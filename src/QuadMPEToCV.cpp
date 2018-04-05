@@ -1,6 +1,5 @@
 #include "QuadMPEToCV.hpp"
 
-
 QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 	// QuadMPEToCV *module = new QuadMPEToCV();
 	// setModule(module);
@@ -17,7 +16,6 @@ QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 	}
 
 	float margin = 5;
-	float labelHeight = 15;
 	float yPos = margin;
 	
 	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
@@ -47,14 +45,19 @@ QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 
 	std::string labels[QuadMPEToCV::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Pressure", "Y axis"} ;
 	for (int i = 0; i < 5 ; i++) {
-		addOutput(createOutput<PJ3410Port>(Vec(2 * (40), yPos - 5), module, i * 4));
-		addOutput(createOutput<PJ3410Port>(Vec(3 * (40), yPos - 5), module, i * 4 + 1));
-		addOutput(createOutput<PJ3410Port>(Vec(4 * (40), yPos - 5), module, i * 4 + 2));
-		addOutput(createOutput<PJ3410Port>(Vec(5 * (40), yPos - 5), module, i * 4 + 3));
+		// addOutput(createOutput<PJ3410Port>(Vec(2 * (40), yPos - 5), module, i * 4));
+		// addOutput(createOutput<PJ3410Port>(Vec(3 * (40), yPos - 5), module, i * 4 + 1));
+		// addOutput(createOutput<PJ3410Port>(Vec(4 * (40), yPos - 5), module, i * 4 + 2));
+		// addOutput(createOutput<PJ3410Port>(Vec(5 * (40), yPos - 5), module, i * 4 + 3));
+		addOutput(Port::create<PJ3410Port>(Vec(2 * (40), yPos - 5), Port::OUTPUT, module, i * 4));
+		addOutput(Port::create<PJ3410Port>(Vec(3 * (40), yPos - 5), Port::OUTPUT, module, i * 4 + 1));
+		addOutput(Port::create<PJ3410Port>(Vec(4 * (40), yPos - 5), Port::OUTPUT, module, i * 4 + 2));
+		addOutput(Port::create<PJ3410Port>(Vec(5 * (40), yPos - 5), Port::OUTPUT, module, i * 4 + 3));
 		yPos += 40;
 		// yPos += yGap + margin;
 	}
-	addOutput(createOutput<PJ3410Port>(Vec(2 * (40), yPos - 5), module, 20));
+	// Our Pedal output
+	addOutput(Port::create<PJ3410Port>(Vec(2 * (40), yPos - 5), Port::OUTPUT, module, 20));
 
 };
 
