@@ -58,4 +58,4 @@ QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 
 };
 
-Model *modelQuadMPEToCV = Model::create<QuadMPEToCV, QuadMPEToCVWidget>("Erratic", "QuadMPEToCV", "Quad MPE To CV", MIDI_TAG, EXTERNAL_TAG);
+Model *modelQuadMPEToCV = Model::create<QuadMPEToCV, QuadMPEToCVWidget>("ErraticInstruments", "QuadMPEToCV", "Quad MPE To CV", MIDI_TAG, EXTERNAL_TAG);
