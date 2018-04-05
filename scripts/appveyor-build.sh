@@ -12,7 +12,7 @@ export VCV_HOME_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 env | sort
 
-mkdir -p "${VCV_RACK_DIR}" \
+mkdir -p "${VCV_RACK_DIR}"
 git clone -n --branch=${VCV_RACK_COMMIT} https://github.com/VCVRack/Rack.git "${VCV_RACK_DIR}" || true
 cd "${VCV_RACK_DIR}"
 git submodule update --init --recursive
