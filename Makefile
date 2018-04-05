@@ -1,5 +1,5 @@
-SLUG = Erratic
-VERSION = 0.6.0
+SLUG = ErraticInstruments
+VERSION = 0.6.1
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
@@ -27,5 +27,3 @@ DISTRIBUTABLES += $(wildcard LICENSE*) res
 # Include the VCV plugin Makefile framework
 RACK_DIR ?= ../..
 include $(RACK_DIR)/plugin.mk
-
-# include ../../plugin.mk
