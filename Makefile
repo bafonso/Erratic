@@ -13,13 +13,6 @@ CXXFLAGS +=
 # Static libraries are fine.
 LDFLAGS +=
 
-# Needed in order to compile on Windows (Daniele Zerbini)
-# see https://www.facebook.com/groups/vcvrack/permalink/155099375150215/
-include $(RACK_DIR)/arch.mk
-ifeq ($(ARCH), win)
-	LDFLAGS += -L"$(RACK_DIR)/dep/lib" -lrtmidi
-endif
-
 # Add .cpp and .c files to the build
 SOURCES += $(wildcard src/*.cpp)
 
