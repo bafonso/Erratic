@@ -2,6 +2,7 @@
 #include "midi.hpp"
 #include "dsp/digital.hpp"
 #include "MPEBaseWidget.hpp"
+#include <iostream>
 
 
 struct MidiValue {
@@ -75,7 +76,7 @@ struct QuadMPEToCV : Module {
 	int polyphony = 4;
 	std::vector<MPEChannel> mpeChannels;
 	// MPEChannel mpeChannels[4] ; // using this here instead of a container
-	
+
 	bool noteOffReset = true; // Our default
     int baseMIDIChannel = 2 ;
 	int bendRange = 48; // our default is 48 (common for ROLI), Continuum defaults to 96. This is a global parameter (for now)
@@ -97,7 +98,7 @@ struct QuadMPEToCV : Module {
 		// 	//pitchWheel[p].tSmooth.set(0, 0);
 		// }
 		mpeChannels.reserve(polyphony);
-		midiPedalOne.cc = 12; // By default we use 12 (barrel i on the Haken Continuum)		
+		midiPedalOne.cc = 12; // By default we use 12 (barrel i on the Haken Continuum)
 		this->setupMIDIChannels();
 	}
 
@@ -121,7 +122,7 @@ struct QuadMPEToCV : Module {
 		json_object_set_new(rootJ, "baseMIDIChannel", json_integer(baseMIDIChannel));
 		json_object_set_new(rootJ, "globalMidiChannel", json_integer(globalMIDIChannel));
 		json_object_set_new(rootJ, "MPEMode", json_integer(MPEPlus));
-		return rootJ;	
+		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
@@ -150,11 +151,11 @@ struct QuadMPEToCV : Module {
 	// 	json_t *bendRangeJ = json_object_get(rootJ, "bendRange");
 	// 	if (bendRangeJ)
 	// 		bendRange = json_integer_value(bendRangeJ);
-		
+
 	// 	json_t *baseMIDIChannelJ = json_object_get(rootJ, "baseMIDIChannel");
 	// 	if (baseMIDIChannelJ)
 	// 		baseMIDIChannel = json_integer_value(baseMIDIChannelJ);
-		
+
 	// 	json_t *globalMIDIChannelJ = json_object_get(rootJ, "globalMIDIChannel");
 	// 	if (globalMIDIChannelJ)
 	// 		globalMIDIChannel = json_integer_value(globalMIDIChannelJ);
@@ -261,7 +262,7 @@ void QuadMPEToCV::step() {
 				outputs[VELOCITY_OUTPUT+ci].value = mpeChannels[ci].note.vel / 127.f * 10.f;
 				outputs[PITCH_OUTPUT+ci].value = (((mpeChannels[ci].note.pitch - 60)) / 12.0) + ((mpeChannels[ci].pitchWheel.val - 8192 ) / 8192.0 / 12.0 * (float)bendRange ) ;
 				// std::cout << "outputs[VELOCITY_OUTPUT+ci].value is " << outputs[VELOCITY_OUTPUT+ci].value << std::endl;
-				
+
 				if (mpeChannels[ci].note.noteOff && noteOffReset) { // We reset all info when the note goes off
 					std::cout << "We execute the note off reset" << std::endl;
 					mpeChannels[ci].pitchWheel.val = 0;
@@ -298,7 +299,7 @@ void QuadMPEToCV::step() {
 						outputs[Y_OUTPUT+ci].value = mpeChannels[ci].MPEPlusyAxis.val / 16384.0 * 10.f;
 						// std::cout << "Y axis is " << outputs[Y_OUTPUT].value << std::endl;
 						mpeChannels[ci].MPEPlusyAxis.changed = false;
-					} 
+					}
 				} else {
 					if (mpeChannels[ci].afterTouch.changed ) {
 						outputs[PRESSURE_OUTPUT+ci].value = mpeChannels[ci].afterTouch.val / 127.f * 10.f;
@@ -312,8 +313,8 @@ void QuadMPEToCV::step() {
 					}
 				}
 			}
-		
-		mpeChannels[ci].changed = false;	
+
+		mpeChannels[ci].changed = false;
 		}
 	}
 
@@ -352,14 +353,14 @@ void QuadMPEToCV::step() {
 			Yaxis.changed = false;
 		}
 	}
-	
+
 
 	// 1/V incorporates pitch wheel changes
 	if (pitchWheel.changed | this->newNote) {
 		outputs[PITCH_OUTPUT].value = (((note - 60)) / 12.0) + ((pitchWheel.val - 8192 ) / 8192.0 / 12.0 * (float)bendRange ) ;
 		pitchWheel.changed = false;
 		this->newNote = false;
-	}	
+	}
 
 	*/
 }
@@ -369,7 +370,7 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 	int8_t status = msg.status(); //(msg[0] >> 4) & 0xf;
 	int8_t data1 = msg.data1;
 	int8_t data2 = msg.data2;
-	
+
 	if (status == 0xb && ( data1 == 111 || data1 == 118)) {
 		return;
 	}
@@ -380,7 +381,7 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 	// std::cout << "MIDI channel and mpeChannels[0].MIDIChannel " << channel << " " << mpeChannels[0].MIDIChannel << std::endl;
 
 	// std::cout << "polyphony is " << polyphony << std::endl;
-	// std::cout << "mpeChannels[0].MIDIChannel is " << mpeChannels[0].MIDIChannel << " and mpeChannels[polyphony].MIDIChannel " 
+	// std::cout << "mpeChannels[0].MIDIChannel is " << mpeChannels[0].MIDIChannel << " and mpeChannels[polyphony].MIDIChannel "
 	// << mpeChannels[polyphony-1].MIDIChannel << std::endl;
 	// for (int p=0; p < polyphony ; p++ ) {
 	// 	std::cout << " mpeChannels[" << p << "].MIDIChannel: " << mpeChannels[p].MIDIChannel << std::endl;
@@ -397,7 +398,7 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 		// 3		1	3
 
 		int ci = channel - baseMIDIChannel + 1;
-		
+
 		switch (status) {
 			// note off
 			case 0x8: {
@@ -435,7 +436,7 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 				break;
 			case 0xe: // pitch wheel, we combine two 7 bit in two bytes into a 14bit msg
 				{
-				
+
 				// We want 2 bytes but variable size may change with platform, maybe we should do a more robust way
 				uint16_t twoBytes ; // Initialize our final pitchWheel variable.
 				// we don't need to shift the first byte because it's 7 bit (always starts with 0)
@@ -449,7 +450,7 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 		}
 		if (MPEPlus) { // Processing MPE+ data
 			// Note from the Haken Continuum Manual:
-			// (To avoid the glitches, the synthesizer can do synchronous 14-bit updates with output from the Continuum: 
+			// (To avoid the glitches, the synthesizer can do synchronous 14-bit updates with output from the Continuum:
 			// simply save the least significant data, and do not apply it until the most significant data is received.)
 			switch (data1) {
 				case 74: // Y axis
@@ -503,7 +504,7 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 			case 0xb: // cc
 				if (MPEPlus) { // Processing MPE+ data
 					// Note from the Haken Continuum Manual:
-					// (To avoid the glitches, the synthesizer can do synchronous 14-bit updates with output from the Continuum: 
+					// (To avoid the glitches, the synthesizer can do synchronous 14-bit updates with output from the Continuum:
 					// simply save the least significant data, and do not apply it until the most significant data is received.)
 					switch (data1) {
 						case 74: // Y axis
@@ -552,7 +553,7 @@ void QuadMPEToCV::processMessage(MidiMessage msg) {
 				//     std::cout << "Byte " << i << " = " << (int)msg[i] << ", ";
 				// if ( nBytes > 0 )
 				//     std::cout << "stamp = " << stamp << std::endl;
-		
+
 				// We want 2 bytes but variable size may change with platform, maybe we should do a more robust way
 				uint16_t twoBytes ; // Initialize our final pitchWheel variable.
 				// we don't need to shift the first byte because it's 7 bit (always starts with 0)
@@ -601,7 +602,7 @@ struct QuadBendRangeItem : MenuItem {
 struct QuadBendRangeChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
-	
+
 	int bendRange ;
 	void onAction(EventAction &e) override {
 			Menu *menu = gScene->createMenu();
@@ -634,7 +635,7 @@ struct QuadMidiChannelItem : MenuItem {
 struct QuadMidiChannelChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
-	
+
 	int channel ;
 	void onAction(EventAction &e) override {
 			Menu *menu = gScene->createMenu();
@@ -666,7 +667,7 @@ struct QuadGlobalMidiChannelItem : MenuItem {
 struct QuadGlobalMidiChannelChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
-	
+
 	int channel ;
 	void onAction(EventAction &e) override {
 			Menu *menu = gScene->createMenu();
@@ -697,11 +698,11 @@ struct QuadMPEModeItem : MenuItem {
 struct QuadMPEModeChoice : LedDisplayChoice {
 	// QuadMPEToCVWidget *quadmpetocvwidget;
 	QuadMPEToCV *quadmpetocv;
-	
+
 	bool MPEPlus ;
 	void onAction(EventAction &e) override {
 			Menu *menu = gScene->createMenu();
-			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MPE mode"));			
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MPE mode"));
 			// MPE
 			QuadMPEModeItem *MPE = new QuadMPEModeItem();
 			MPE->quadmpetocv = quadmpetocv;
@@ -723,7 +724,7 @@ struct QuadMPEModeChoice : LedDisplayChoice {
 			text = "MPE+";
 		} else {
 			text = "MPE";
-		}		
+		}
 	}
 };
 
@@ -778,7 +779,7 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 	}
 	void step() override {
 		MPEBaseWidget::step();
-		
+
 		midiChannelChoice->box.size.x = box.size.x/4;
 		midiChannelChoice->box.pos.x = 0;
 
@@ -787,18 +788,18 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 
 		bendRangeChoice->box.size.x = box.size.x/4;
 		bendRangeChoice->box.pos.x = box.size.x/4 * 2 ;
-		
+
 		mpeModeChoice->box.size.x = box.size.x/4;
 		mpeModeChoice->box.pos.x = box.size.x/4 * 3 - 5 ;
 
 		for (int y = 0; y < 2; y++) {
 			hSeparators[y]->box.size.x = box.size.x;
 		}
-		
+
 		for (int x = 1; x < 3; x++) {
 			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
 		}
-		
+
 	}
 };
 
@@ -853,7 +854,7 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 // 	}
 // 	void step() override {
 // 		MPEBaseWidget::step();
-		
+
 // 		midiChannelChoice->box.size.x = box.size.x/4;
 // 		midiChannelChoice->box.pos.x = 0;
 
@@ -862,17 +863,17 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 
 // 		bendRangeChoice->box.size.x = box.size.x/4;
 // 		bendRangeChoice->box.pos.x = box.size.x/4 * 2 ;
-		
+
 // 		mpeModeChoice->box.size.x = box.size.x/4;
 // 		mpeModeChoice->box.pos.x = box.size.x/4 * 3 - 5 ;
 
 // 		for (int y = 0; y < 2; y++) {
 // 			hSeparators[y]->box.size.x = box.size.x;
 // 		}
-		
+
 // 		for (int x = 1; x < 4; x++) {
 // 			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
 // 		}
-		
+
 // 	}
 // };
