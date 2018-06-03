@@ -1,4 +1,5 @@
 #include "MPEToCV.hpp"
+#include <iostream>
 
 MPEToCV::MPEToCV() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 	pitchWheel.val = 64;
@@ -8,7 +9,7 @@ MPEToCV::MPEToCV() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 
 
 void MPEToCV::step() {
-	
+
 	MidiMessage msg;
 	while (midiInput.shift(&msg)) {
 		processMessage(msg);
@@ -53,7 +54,7 @@ void MPEToCV::step() {
 			Yaxis.changed = false;
 		}
 	}
-	
+
 	// Pedal
 	if (midiPedalOne.changed) {
 		outputs[PEDAL_OUTPUT].value = midiPedalOne.val / 127.f * 10.f ;
@@ -65,7 +66,7 @@ void MPEToCV::step() {
 		outputs[PITCH_OUTPUT].value = (((note - 60)) / 12.0) + ((pitchWheel.val - 8192 ) / 8192.0 / 12.0 * (float)bendRange ) ;
 		pitchWheel.changed = false;
 		this->newNote = false;
-	}	
+	}
 }
 
 // Currently only support one note
@@ -133,7 +134,7 @@ void MPEToCV::processMessage(MidiMessage msg) {
 			case 0xb: // cc
 				if (MPEPlus) { // Processing MPE+ data
 					// Note from the Haken Continuum Manual:
-					// (To avoid the glitches, the synthesizer can do synchronous 14-bit updates with output from the Continuum: 
+					// (To avoid the glitches, the synthesizer can do synchronous 14-bit updates with output from the Continuum:
 					// simply save the least significant data, and do not apply it until the most significant data is received.)
 					switch (data1) {
 						case 74: // Y axis
@@ -175,7 +176,7 @@ void MPEToCV::processMessage(MidiMessage msg) {
 				break;
 			case 0xe: // pitch wheel, we combine two 7 bit in two bytes into a 14bit msg
 				{
-		
+
 				// We want 2 bytes but variable size may change with platform, maybe we should do a more robust way
 				uint16_t twoBytes ; // Initialize our final pitchWheel variable.
 				// we don't need to shift the first byte because it's 7 bit (always starts with 0)
@@ -212,7 +213,7 @@ MPEToCVWidget::MPEToCVWidget(MPEToCV *module) : ModuleWidget(module) {
 	// MPEToCV *module = new MPEToCV();
 	// setModule(module);
 	box.size = Vec(15 * 10, 380);
-	
+
 	Vec pos = Vec();
 	MPEMidiWidget *mpemidiWidget ;
 	// bendRangeChoice = LedDisplayChoice;
@@ -254,7 +255,7 @@ MPEToCVWidget::MPEToCVWidget(MPEToCV *module) : ModuleWidget(module) {
 	std::string labels[MPEToCV::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Pressure", "Y axis","Pedal"
 														};
 	yPos = mpemidiWidget->box.pos.y + mpemidiWidget->box.size.y + 5*margin ;
-	
+
 	for (int i = 0; i < MPEToCV::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
