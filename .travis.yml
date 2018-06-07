@@ -25,8 +25,9 @@ before_script:
 - cd /tmp/Rack
 - git submodule update --init --recursive
 - if [ $TRAVIS_OS_NAME == linux ]; then export CC=gcc-7 && CXX=g++-7; fi
-- make -j 8 dep #> /dev/null
-- make -j 8
+- make dep -j4 #> /dev/null
+- make clean
+- make -j4
 - rm -rf /tmp/Rack/plugins/sdr || true
 - cp -r $TRAVIS_BUILD_DIR /tmp/Rack/plugins/sdr
 script:
