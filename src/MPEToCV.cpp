@@ -40,7 +40,7 @@ void MPEToCV::step() {
 			// Combine two 7 bit into 14bit
 			MPEPlusyAxis.val = ( (uint16_t)MPEPlusyAxis.MSB << 7) | ( (uint16_t)MPEPlusyAxis.LSB ) ;
 			outputs[Y_OUTPUT].value = MPEPlusyAxis.val / 16384.0 * 10.f;
-			std::cout << "Y axis is " << outputs[Y_OUTPUT].value << std::endl;
+			//std::cout << "Y axis is " << outputs[Y_OUTPUT].value << std::endl;
 			MPEPlusyAxis.changed = false;
 		}
 	} else {  // Standard resolution MPE
@@ -195,7 +195,7 @@ void MPEToCV::processMessage(MidiMessage msg) {
 	if (this->globalChannel == (channel + 1) ) {
 		//std::cout <<"Global channel!" << std::endl;
 		if (data1 == midiPedalOne.cc) {
-			std::cout <<"Pedal One value is " << data2 << std::endl;
+			//std::cout <<"Pedal One value is " << data2 << std::endl;
 			midiPedalOne.val = data2;
 			midiPedalOne.changed = true;
 		}

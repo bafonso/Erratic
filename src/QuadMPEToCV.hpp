@@ -263,7 +263,7 @@ void QuadMPEToCV::step() {
 				// std::cout << "outputs[VELOCITY_OUTPUT+ci].value is " << outputs[VELOCITY_OUTPUT+ci].value << std::endl;
 				
 				if (mpeChannels[ci].note.noteOff && noteOffReset) { // We reset all info when the note goes off
-					std::cout << "We execute the note off reset" << std::endl;
+					//std::cout << "We execute the note off reset" << std::endl;
 					mpeChannels[ci].pitchWheel.val = 0;
 					mpeChannels[ci].pitchWheel.changed = false;
 					outputs[PITCH_OUTPUT+ci].value = 0 ;
@@ -290,7 +290,7 @@ void QuadMPEToCV::step() {
 						mpeChannels[ci].MPEPluszAxis.val = ( (uint16_t)mpeChannels[ci].MPEPluszAxis.MSB << 7) | ( (uint16_t)mpeChannels[ci].MPEPluszAxis.LSB ) ;
 						outputs[PRESSURE_OUTPUT+ci].value = mpeChannels[ci].MPEPluszAxis.val / 16384.0 * 10.f;
 						mpeChannels[ci].MPEPluszAxis.changed = false;
-						std::cout << "Setting pressure on ci " << ci << " to " << outputs[PRESSURE_OUTPUT+ci].value << std::endl;
+						//std::cout << "Setting pressure on ci " << ci << " to " << outputs[PRESSURE_OUTPUT+ci].value << std::endl;
 					}
 					if (mpeChannels[ci].MPEPlusyAxis.changed) {
 						// Combine two 7 bit into 14bit
