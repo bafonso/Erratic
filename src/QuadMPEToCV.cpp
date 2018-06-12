@@ -31,30 +31,15 @@ QuadMPEToCVWidget::QuadMPEToCVWidget(QuadMPEToCV *module):ModuleWidget(module) {
 	addChild(quadmpemidiWidget);
 	pos = quadmpemidiWidget->box.getBottomLeft();
 
-
-
-		// MidiChoice *midiChoice = new MidiChoice();
-		// midiChoice->midiModule = dynamic_cast<MidiIO *>(module);
-		// midiChoice->box.pos = Vec(margin, 40);
-		// midiChoice->box.size.x = box.size.x - 10;
-		// addChild(midiChoice);
-		// yPos += midiChoice->box.size.y + 4*margin;
-
-
 	yPos = quadmpemidiWidget->box.pos.y + quadmpemidiWidget->box.size.y + 6*margin ;
 
 	std::string labels[QuadMPEToCV::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Pressure", "Y axis"} ;
 	for (int i = 0; i < 5 ; i++) {
-		// addOutput(createOutput<PJ3410Port>(Vec(2 * (40), yPos - 5), module, i * 4));
-		// addOutput(createOutput<PJ3410Port>(Vec(3 * (40), yPos - 5), module, i * 4 + 1));
-		// addOutput(createOutput<PJ3410Port>(Vec(4 * (40), yPos - 5), module, i * 4 + 2));
-		// addOutput(createOutput<PJ3410Port>(Vec(5 * (40), yPos - 5), module, i * 4 + 3));
 		addOutput(Port::create<PJ3410Port>(Vec(2 * (40), yPos - 5), Port::OUTPUT, module, i * 4));
 		addOutput(Port::create<PJ3410Port>(Vec(3 * (40), yPos - 5), Port::OUTPUT, module, i * 4 + 1));
 		addOutput(Port::create<PJ3410Port>(Vec(4 * (40), yPos - 5), Port::OUTPUT, module, i * 4 + 2));
 		addOutput(Port::create<PJ3410Port>(Vec(5 * (40), yPos - 5), Port::OUTPUT, module, i * 4 + 3));
 		yPos += 40;
-		// yPos += yGap + margin;
 	}
 	// Our Pedal output
 	addOutput(Port::create<PJ3410Port>(Vec(2 * (40), yPos - 5), Port::OUTPUT, module, 20));

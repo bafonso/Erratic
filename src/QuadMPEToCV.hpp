@@ -121,6 +121,7 @@ struct QuadMPEToCV : Module {
 		json_object_set_new(rootJ, "baseMIDIChannel", json_integer(baseMIDIChannel));
 		json_object_set_new(rootJ, "globalMidiChannel", json_integer(globalMIDIChannel));
 		json_object_set_new(rootJ, "MPEMode", json_integer(MPEPlus));
+		json_object_set_new(rootJ, "noteOffReset", json_boolean(noteOffReset));
 		return rootJ;	
 	}
 
@@ -142,6 +143,10 @@ struct QuadMPEToCV : Module {
 		json_t *MPEModeJ = json_object_get(rootJ, "MPEMode");
 		if (MPEModeJ) {
 			MPEPlus = json_integer_value(MPEModeJ);
+		}
+		json_t *noteOffResetJ = json_object_get(rootJ, "noteOffReset");
+		if (noteOffResetJ) {
+			noteOffReset = json_integer_value(noteOffResetJ);
 		}
 	}
 
@@ -193,6 +198,28 @@ struct QuadMPEToCV : Module {
 
 struct QuadMPEToCVWidget : ModuleWidget {
 	QuadMPEToCVWidget(QuadMPEToCV *module);
+
+	// Reset Notes or not	
+	void appendContextMenu(Menu *menu) override {
+	QuadMPEToCV *module = dynamic_cast<QuadMPEToCV*>(this->module);
+
+		struct ResetNoteItem : MenuItem {
+			QuadMPEToCV *module;
+			bool resetNoteBool;
+			void onAction(EventAction &e) override {
+				module->noteOffReset = ! resetNoteBool;
+			}
+		};
+
+		
+		ResetNoteItem *item = MenuItem::create<ResetNoteItem>("Reset Note", CHECKMARK(module->noteOffReset == true));
+		item->module = module;
+		item->resetNoteBool = module->noteOffReset;
+		menu->addChild(item);
+
+	}
+
+
 };
 
 
@@ -263,17 +290,20 @@ void QuadMPEToCV::step() {
 				// std::cout << "outputs[VELOCITY_OUTPUT+ci].value is " << outputs[VELOCITY_OUTPUT+ci].value << std::endl;
 				
 				if (mpeChannels[ci].note.noteOff && noteOffReset) { // We reset all info when the note goes off
-					//std::cout << "We execute the note off reset" << std::endl;
-					mpeChannels[ci].pitchWheel.val = 0;
-					mpeChannels[ci].pitchWheel.changed = false;
-					outputs[PITCH_OUTPUT+ci].value = 0 ;
-					mpeChannels[ci].afterTouch.val = 0;
-					mpeChannels[ci].afterTouch.changed = false;
-					outputs[PRESSURE_OUTPUT+ci].value = 0 ;
-					mpeChannels[ci].Yaxis.val = 0;
-					mpeChannels[ci].Yaxis.changed = false;
-					outputs[Y_OUTPUT+ci].value = 0 ;
 					mpeChannels[ci].note.noteOff = false;
+				
+					if (noteOffReset) {					
+						//std::cout << "We execute the note off reset" << std::endl;
+						mpeChannels[ci].pitchWheel.val = 0;
+						mpeChannels[ci].pitchWheel.changed = false;
+						outputs[PITCH_OUTPUT+ci].value = 0 ;
+						mpeChannels[ci].afterTouch.val = 0;
+						mpeChannels[ci].afterTouch.changed = false;
+						outputs[PRESSURE_OUTPUT+ci].value = 0 ;
+						mpeChannels[ci].Yaxis.val = 0;
+						mpeChannels[ci].Yaxis.changed = false;
+						outputs[Y_OUTPUT+ci].value = 0 ;
+					}	
 				}
 				mpeChannels[ci].note.changed = false;
 			}
@@ -801,78 +831,3 @@ struct QuadMPEMidiWidget : MPEBaseWidget {
 		
 	}
 };
-
-// // We extend the midi to follow similar design
-// struct MPEMidiWidget : MPEBaseWidget {
-// 	LedDisplaySeparator *hSeparators[2];
-// 	LedDisplaySeparator *vSeparators[3];
-// 	// LedDisplayChoice *ccChoices[4][4];
-// 	QuadMPEToCV *quadmpetocv ;
-// 	BendRangeChoice *bendRangeChoice ;
-// 	MidiChannelChoice *midiChannelChoice ;
-// 	GlobalMidiChannelChoice *globalMidiChannelChoice ;
-// 	MPEModeChoice *mpeModeChoice ;
-
-// 	MPEMidiWidget() {
-// 	}
-
-// 	void initialize(QuadMPEToCV *quadmpetocv) {
-// 		this->quadmpetocv = quadmpetocv;
-// 		Vec pos = deviceChoice->box.getBottomLeft();
-// 		for (int y = 0; y < 2; y++) {
-// 			hSeparators[y] = Widget::create<LedDisplaySeparator>(pos);
-// 			addChild(hSeparators[y]);
-// 		}
-
-// 		midiChannelChoice = Widget::create<MidiChannelChoice>(pos);
-// 		midiChannelChoice->quadmpetocv = quadmpetocv ;
-// 		addChild(midiChannelChoice);
-
-// 		globalMidiChannelChoice = Widget::create<GlobalMidiChannelChoice>(pos);
-// 		globalMidiChannelChoice->quadmpetocv = quadmpetocv ;
-// 		addChild(globalMidiChannelChoice);
-
-// 		bendRangeChoice = Widget::create<BendRangeChoice>(pos);
-// 		bendRangeChoice->quadmpetocv = quadmpetocv ;
-// 		addChild(bendRangeChoice);
-
-// 		mpeModeChoice = Widget::create<MPEModeChoice>(pos);
-// 		mpeModeChoice->quadmpetocv = quadmpetocv ;
-// 		addChild(mpeModeChoice);
-
-
-// 		for (int x = 1; x < 4; x++) {
-// 			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
-// 			addChild(vSeparators[x]);
-// 		}
-
-// 		for (int x = 1; x < 4; x++) {
-// 			vSeparators[x]->box.size.y = midiChannelChoice->box.size.y;
-
-// 		}
-// 	}
-// 	void step() override {
-// 		MPEBaseWidget::step();
-		
-// 		midiChannelChoice->box.size.x = box.size.x/4;
-// 		midiChannelChoice->box.pos.x = 0;
-
-// 		globalMidiChannelChoice->box.size.x = box.size.x/4;
-// 		globalMidiChannelChoice->box.pos.x = box.size.x/4;
-
-// 		bendRangeChoice->box.size.x = box.size.x/4;
-// 		bendRangeChoice->box.pos.x = box.size.x/4 * 2 ;
-		
-// 		mpeModeChoice->box.size.x = box.size.x/4;
-// 		mpeModeChoice->box.pos.x = box.size.x/4 * 3 - 5 ;
-
-// 		for (int y = 0; y < 2; y++) {
-// 			hSeparators[y]->box.size.x = box.size.x;
-// 		}
-		
-// 		for (int x = 1; x < 4; x++) {
-// 			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
-// 		}
-		
-// 	}
-// };

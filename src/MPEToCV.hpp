@@ -71,6 +71,10 @@ struct MPEToCV : Module {
 	MPEPlusValue MPEPlusyAxis, MPEPluszAxis ;
 	bool gate = false;
 
+	// Reset note parameters when you release, ie, receive note off
+	bool noteOffReset = true;
+	bool resetNoteNow = false;
+
 	// SchmittTrigger resetTrigger;
 
 	MPEToCV();
@@ -93,6 +97,7 @@ struct MPEToCV : Module {
 		json_object_set_new(rootJ, "midiChannel", json_integer(channel));
 		json_object_set_new(rootJ, "globalMidiChannel", json_integer(globalChannel));
 		json_object_set_new(rootJ, "MPEMode", json_integer(MPEPlus));
+		json_object_set_new(rootJ, "noteOffReset", json_boolean(noteOffReset));
 		return rootJ;
 		
 	}
@@ -115,6 +120,10 @@ struct MPEToCV : Module {
 		json_t *MPEModeJ = json_object_get(rootJ, "MPEMode");
 		if (MPEModeJ) {
 			MPEPlus = json_integer_value(MPEModeJ);
+		}
+		json_t *noteOffResetJ = json_object_get(rootJ, "noteOffReset");
+		if (noteOffResetJ) {
+			noteOffReset = json_boolean_value(noteOffResetJ);
 		}
 	}
 
@@ -332,4 +341,6 @@ struct MPEMidiWidget : MPEBaseWidget {
 		}
 		
 	}
+
+
 };
